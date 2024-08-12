@@ -1,4 +1,5 @@
-﻿using Syncfusion.Drawing;
+﻿using SF_WebsiteToPdf;
+using Syncfusion.Drawing;
 using Syncfusion.HtmlConverter;
 using Syncfusion.Pdf;
 
@@ -6,41 +7,48 @@ Console.WriteLine("Hello, World!");
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzQwMDY4MEAzMjM2MmUzMDJlMzBEaXFOMHhrRy9aWEttTVoyVnMxZ2dFUFI3ZTBZbENDK2FxS21KdmY3aTBrPQ==");
 
-//string url = "https://firstsiteguide.com/examples-of-blogs/#lifestyle-blogs";
-string url = "https://qadentsource.com/Products/DentaQual/ScoreCardExt/13158625-646D-4657-9EA0-97DC1C2BC9BB/7A5CF855-4390-46F2-826F-04690DA9A932/2323232";
-
-// Initialize the HTML to PDF converter
-HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter();
-
+string filePath = "C:\\Users\\chandru.ts\\Desktop\\Urls.txt";
 int viewportWidth = 1366;
 int viewportHeight = 0;
 
-// Set the Blink converter settings
-BlinkConverterSettings settings = new BlinkConverterSettings();
-settings.ViewPortSize = new Size(viewportWidth, viewportHeight);
-//settings.Margin = new Syncfusion.Pdf.Graphics.PdfMargins();
-
-settings.Css = @"
-    .row { display: flex; flex-wrap: wrap; }
-    .col-md-6, .col-md-12, .col-sm-12 { flex: 0 0 50%; max-width: 50%; }
-    body { margin: 0; }
-";
-
-// Use screen media type
-settings.MediaType = MediaType.Screen;
-htmlConverter.ConverterSettings = settings;
-
-
-// Convert the URL to a PDF document
-PdfDocument document = htmlConverter.Convert(url);
-
-// Save the PDF document to a file using FileStream
-using (FileStream stream = new FileStream("C:\\Users\\chandru.ts\\Downloads\\output.pdf", FileMode.Create, FileAccess.Write))
+if (!File.Exists(filePath))
 {
-    document.Save(stream);
+    Console.WriteLine("File not found.");
+    return;
 }
 
-// Close the document
-document.Close(true);
+string[] urls = File.ReadAllLines(filePath);
+
+if(!urls.Any())
+{
+    Console.WriteLine("No Urls found.");
+    return;
+}
+
+BlinkConverterSettings settings = new BlinkConverterSettings();
+settings.ViewPortSize = new Size(viewportWidth, viewportHeight);
+settings.Margin.Top = 0;
+settings.MediaType = MediaType.Screen;
+settings.Css = CustomStyle.customCss;
+
+HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter();
+htmlConverter.ConverterSettings = settings;
+
+var index = 1;
+
+foreach (var url in urls)
+{
+    if (!string.IsNullOrWhiteSpace(url))
+    {
+        PdfDocument document = htmlConverter.Convert(url);
+
+        using (FileStream stream = new FileStream($"C:\\Users\\chandru.ts\\Downloads\\outputFile{index++}.pdf", FileMode.Create, FileAccess.Write))
+        {
+            document.Save(stream);
+        }
+
+        document.Close(true); 
+    }
+}
 
 Console.WriteLine("PDF saved successfully.");
