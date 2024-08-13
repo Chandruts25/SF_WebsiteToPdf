@@ -28,6 +28,7 @@ if(!urls.Any())
 BlinkConverterSettings settings = new BlinkConverterSettings();
 settings.ViewPortSize = new Size(viewportWidth, viewportHeight);
 settings.Margin.Top = 0;
+settings.AdditionalDelay = 3000;
 settings.MediaType = MediaType.Screen;
 settings.Css = CustomStyle.customCss;
 
